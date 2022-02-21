@@ -73,7 +73,7 @@ public class SettingMenu : MonoBehaviour {
 
 		///Back to previous menu
 		PreviousMenu.SetActive(true);
-}
+	}
 
 	public void ApplySetting() {
 		//// Save Volume
