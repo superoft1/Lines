@@ -1,32 +1,42 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
+using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class Game : MonoBehaviour {
     [SerializeField] private int pointsPerRow = 15;
     [SerializeField] private int extraTilesMultiplier = 2;
     [SerializeField] private TileSpawner _spawner;
     [SerializeField] private GameLost lostPanel;
-    [SerializeField] private ExitGame exitPanel;
+    [SerializeField] private PauseGame pausePanel;
     [SerializeField] private Text pointsText;
     private int points = 0;
 
     public TileSpawner spawner { get { return _spawner; } }
 
+    private bool isPause = false;
+
+    private int[] highScores;
+
     void Start() {
         Debug.Log("Loaded scene Game");
+        LoadHighScore();
         newGame();
     }
 
     void Update () {
-        if (Input.GetButtonDown("Cancel")) exitPanel.display();
-
-        if (Input.GetKeyDown(KeyCode.Alpha0)) addPoints();
-        else if (Input.GetKeyDown(KeyCode.Alpha1)) addPoints(1);
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) addPoints(2);
-        else if (Input.GetKeyDown(KeyCode.L)) gameLost();
-        else if (Input.GetKeyDown(KeyCode.H)) lostPanel.hide();
-        else if (Input.GetKeyDown(KeyCode.E)) exitPanel.display();
-        else if (Input.GetKeyDown(KeyCode.R)) exitPanel.hide();
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            if (isPause) {
+                ResumeGame();
+            }
+            else {
+                PauseGame();
+            }
+        }
     }
 
     public void newGame() {
@@ -35,7 +45,7 @@ public class Game : MonoBehaviour {
         pointsText.text = points.ToString();
         GameObject.FindGameObjectWithTag("Arena").GetComponent<Arena>().removeAllTiles();
         lostPanel.hide();
-        exitPanel.hide();
+        pausePanel.hide();
         spawner.spawn();
     }
 
@@ -53,7 +63,83 @@ public class Game : MonoBehaviour {
 
     public void gameLost() {
         Debug.Log("Game Lost");
+        pausePanel.hide();
+        bool isHighscore = CheckHightscore();
+        SaveHighScore();
+        lostPanel.display(points, isHighscore);
+    }
 
-        lostPanel.display(points, false);
+    public void ResumeGame () {
+        pausePanel.hide();
+        isPause = false;
+    }
+
+    void PauseGame () {
+        pausePanel.display();
+        isPause = true;
+    }
+
+    public void LoadHighScore() {
+        string path = Application.persistentDataPath + "/highscore.bin";
+        if(File.Exists(path)) {
+            FileStream file = File.Open(path, FileMode.Open);
+            BinaryFormatter formatter = new BinaryFormatter();
+            LeaderBoardData highScoreData = (LeaderBoardData)formatter.Deserialize(file);
+            file.Close();
+
+            this.highScores = highScoreData.highScores;
+            Debug.Log("Highscore Loaded from " + path);
+        }
+        else {
+            highScores = new int[0];
+        }
+    }
+
+    public void SaveHighScore() {
+        string path = Application.persistentDataPath + "/highscore.bin";
+        FileStream file = File.Create(path);
+        
+        // Leader board Data
+        LeaderBoardData highScoreData = new LeaderBoardData(highScores);
+        
+        //Create binary formatter
+        BinaryFormatter formatter = new BinaryFormatter();
+        formatter.Serialize(file, highScoreData);
+        file.Close();
+        Debug.Log("Highscore Saved to " + path);
+    }
+
+    private bool CheckHightscore() {
+        int[] newArr = new int[highScores.Length + 1];
+
+        for (int i = 0; i < highScores.Length; i++) {
+            newArr[i] = highScores[i];
+        }
+
+        newArr[highScores.Length] = points;
+
+        Sort(newArr);
+
+        highScores = newArr;
+
+        if (newArr[0] == points) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    private static void Sort(int[] arr) 
+    {
+        int checkPoint = arr[arr.Length - 1];
+        for (int i = 0; i < arr.Length - 1; i++) {
+            if (checkPoint > arr[i]) {
+                int temp = arr[i];
+                arr[i] = checkPoint;
+                checkPoint = temp;
+            }
+        }
+        arr[arr.Length - 1] = checkPoint;
     }
 }

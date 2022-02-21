@@ -10,21 +10,25 @@ public class GameLost : MonoBehaviour {
 
     public void display(int points, bool isHighScore) {
         Debug.Log("Display Game Lost panel");
-
+        Debug.Log(points);
         gameObject.SetActive(true);
         pointsValue.text = points.ToString();
-        if (isHighScore) StartCoroutine(newHighScore());
+        if (isHighScore) {
+            StartCoroutine(newHighScore());
+        }
+        else {
+            highScoreText.SetActive(false);
+        }
     }
 
     public void hide() {
         Debug.Log("Hide Game Lost panel");
-
         gameObject.SetActive(false);
     }
 
     public void backToMenu() {
         Debug.Log("Back to menu");
-
+        Time.timeScale = 1f;
         StartCoroutine(loadMainMenuScene());
     }
 
