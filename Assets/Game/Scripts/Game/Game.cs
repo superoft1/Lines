@@ -22,8 +22,14 @@ public class Game : MonoBehaviour {
 
     private int[] highScores;
 
+    // sound
+    AudioSource audioSource;
+    public AudioClip finishMusic;
+    public AudioClip bgMusic;
+
     void Start() {
         Debug.Log("Loaded scene Game");
+        audioSource = GetComponent<AudioSource>();
         LoadHighScore();
         newGame();
     }
@@ -47,6 +53,7 @@ public class Game : MonoBehaviour {
         lostPanel.hide();
         pausePanel.hide();
         spawner.spawn();
+        PlayLoopSound(bgMusic);
     }
 
     public void addPoints(int extraTiles = 0) {
@@ -66,6 +73,7 @@ public class Game : MonoBehaviour {
         pausePanel.hide();
         bool isHighscore = CheckHightscore();
         SaveHighScore();
+        PlayLoopSound(finishMusic);
         lostPanel.display(points, isHighscore);
     }
 
@@ -141,5 +149,12 @@ public class Game : MonoBehaviour {
             }
         }
         arr[arr.Length - 1] = checkPoint;
+    }
+
+    private void PlayLoopSound(AudioClip music) {
+        audioSource.Stop ();
+        audioSource.loop = true;
+        audioSource.clip = music;
+        audioSource.Play();
     }
 }

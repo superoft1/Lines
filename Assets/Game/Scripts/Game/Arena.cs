@@ -9,6 +9,7 @@ public class Arena : MonoBehaviour {
     private int maxX, maxY;
     private Game game;
     
+    
     public ArenaTile[,] tile { get { return _tile; } private set { _tile = value; } }
 
 	void Awake () {
@@ -272,7 +273,11 @@ public class Arena : MonoBehaviour {
         
         game.addPoints(Mathf.Abs(requiredTilesInLine - (end - start + 1)));
 
-        for(int i = start; i <= end; ++i) tile[i, row].tile.remove();
+        for(int i = start; i <= end; ++i) {
+            if (tile[i, row].tile) {
+                tile[i, row].tile.remove();
+            }
+        } 
     }
 
     private void removeColumn(int col, int start, int end) {
@@ -280,20 +285,28 @@ public class Arena : MonoBehaviour {
 
         game.addPoints(Mathf.Abs(requiredTilesInLine - (end - start + 1)));
 
-        for (int i = start; i <= end; ++i) tile[col, i].tile.remove();
+        for (int i = start; i <= end; ++i) {
+            if (tile[col, i].tile) {
+                tile[col, i].tile.remove();
+            }
+        } 
     }
 
     private void removeMainDiagonal(int count, int startX, int startY) {
         game.addPoints(Mathf.Abs(requiredTilesInLine - count));
         for(int i = 0; i < count; ++i) {
-            tile[startX + i, startY + i].tile.remove();
+            if (tile[startX + i, startY + i].tile) {
+                tile[startX + i, startY + i].tile.remove();
+            }
         } 
     }
 
     private void removeSubDiagonal(int count, int startX, int startY) {
         game.addPoints(Mathf.Abs(requiredTilesInLine - count));
         for(int i = 0; i < count; ++i) {
-            tile[startX + i, startY - i].tile.remove();
+            if(tile[startX + i, startY - i].tile) {
+                tile[startX + i, startY - i].tile.remove();
+            }
         } 
     }
 }

@@ -77,7 +77,9 @@ public class Tile : MonoBehaviour {
     void OnMouseDown() {
         if (selected && !movement) selected = false;
         else {
-            if(manager.selected == null || !manager.selected.movement) selected = true;
+            if(manager.selected == null || !manager.selected.movement) {
+                selected = true;
+            }
         }
     }
 
@@ -88,7 +90,7 @@ public class Tile : MonoBehaviour {
         arTile.tile = this;
 
         anim = GetComponent<Animation>();
-        transform.localScale = new Vector3(0, transform.localScale.y, 0);   //Set scale to 0 before start animation
+        transform.localScale = new Vector3(0, transform.localScale.y, 0);
         anim.Play("Tile New");
     }
 
@@ -121,9 +123,9 @@ public class Tile : MonoBehaviour {
         anim.Play("Tile Remove");
     }
 
-    public void Destroy() { Destroy(gameObject); }  //Used in Tile Remove animation
+    public void Destroy() { Destroy(gameObject); }  
 
-    private IEnumerator toggleNavigation() {    //Toggling between Nav Mesh Agent and obstacle must be delayed because of bug (change position of selected tile)
+    private IEnumerator toggleNavigation() {   
         float waitTime = 0.01f;
 
         if (navMesh.enabled) {
@@ -137,4 +139,5 @@ public class Tile : MonoBehaviour {
             navMesh.enabled = true;
         }
     }
+
 }
