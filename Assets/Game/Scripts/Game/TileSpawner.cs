@@ -30,7 +30,9 @@ public class TileSpawner : MonoBehaviour {
 	public void spawn() {
         List<ArenaTile> possibleTiles = arena.getEmptyTiles();
 
-        if(possibleTiles.Count < 6) game.gameLost();
+        if(possibleTiles.Count < 6) {
+            game.gameLost();
+        }
         else {
             foreach (var ti in tiles) {
                 ArenaTile pos = possibleTiles[Random.Range(0, possibleTiles.Count)];
